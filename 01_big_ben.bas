@@ -1,0 +1,10 @@
+CLS
+
+PRINT "CURRENT HOUR IS?"
+INPUT hour
+
+FOR 1 TO hour
+  PRINT "BONG"
+NEXT i
+
+END

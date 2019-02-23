@@ -41,7 +41,7 @@ def read_cnf(cnf_path, section):
     # password = d
     # database = e
     parser = configparser.ConfigParser()
-    parser.read()
+    parser.read(cnf_path)
     db_opts = {parser[section][i]: i for i in (
         'host', 'port', 'user', 'password', 'database')}
     return db_opts

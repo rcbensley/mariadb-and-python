@@ -25,7 +25,7 @@ CREATE TABLE t_jam_products (
 	price DECIMAL(10,2) NOT NULL
 );
 
-INSERT INTO t_jam_products () VALUES (1, 'Strawberry Jam', 0.57),
+INSERT INTO t_jam_products VALUES (1, 'Strawberry Jam', 0.57),
 	(2, 'Raspberry Jam', 0.59),
 	(3, 'Banana Jam', 0.64), 
 	(4, 'Cheese Jam', 1.23), 

@@ -49,6 +49,7 @@ def load_new(table, values):
     insert_table(cur, table, values)
     cur.execute(TEST_SELECT)
     r = cur.fetchall()
+    print("MariaDB")
     pp(r)
     cur.close()
     c.close()
@@ -63,6 +64,11 @@ def load_legacy(table, values):
     cur = c.cursor()
     cur.execute(f"DELETE FROM {table}")
     insert_table(cur, table, values)
+    cur.execute(TEST_SELECT)
+    r = cur.fetchall()
+    print("MSSQL")
+    pp(r)
+    cur.close()
     cur.close()
     c.close()
 
@@ -91,3 +97,4 @@ if __name__ == "__main__":
 
     load_new("t_jam_orders", NEW_ORDERS)
 #    load_legacy("t_jam_orders", LEGACY_ORDERS)
+

@@ -9,16 +9,14 @@ import pymysql
 import pymssql
 
 TEST_SELECT = """
-SELECT o.order_id
-	, c.customer_name
-	, p.product_name
-	, o.qty
-	, SUM(p.price * o.qty) as total
-	, o.order_date
+SELECT
+    c.customer_name
+    , p.product_name
+    , SUM(p.price * o.qty) as total
 FROM t_jam_orders o
 JOIN t_jam_customers c ON o.customer_id = c.customer_id
 JOIN t_jam_products p ON o.product_id = p.product_id
-GROUP BY o.order_id
+GROUP BY c.customer_name, p.product_name
 """
 
 
@@ -37,7 +35,7 @@ def biz_gen_500():
 
 def insert_table(cursor, table, values):
     for v in values:
-        val_data = ",".join([str(i) if i is int() else f"'{i}'" for i in v])
+        val_data = ",".join([str(i) if i is int() else "'{}'".format(i) for i in v])
         s = "INSERT INTO {t} () VALUES ({d})".format(t=table, d=val_data)
         cursor.execute(s)
 
@@ -45,7 +43,7 @@ def insert_table(cursor, table, values):
 def load_new(table, values):
     c = pymysql.connect(database="jam", autocommit=True, read_default_file="~/.my.cnf")
     cur = c.cursor()
-    cur.execute(f"DELETE FROM {table}")
+    cur.execute("DELETE FROM {}".format(table))
     insert_table(cur, table, values)
     cur.execute(TEST_SELECT)
     r = cur.fetchall()
@@ -62,7 +60,7 @@ def load_legacy(table, values):
         'host', 'port', 'user', 'password', 'database')}
     c = pymssql.connect(**db_opts)
     cur = c.cursor()
-    cur.execute(f"DELETE FROM {table}")
+    cur.execute("DELETE FROM {}".format(table))
     insert_table(cur, table, values)
     cur.execute(TEST_SELECT)
     r = cur.fetchall()
@@ -93,8 +91,8 @@ if __name__ == "__main__":
     LEGACY_ORDERS = gen_orders(day_offset=(3*365))
 
     load_new("t_jam_customers", CUSTOMERS)
-#    load_legacy("t_jam_customers", CUSTOMERS)
+    load_legacy("t_jam_customers", CUSTOMERS)
 
     load_new("t_jam_orders", NEW_ORDERS)
-#    load_legacy("t_jam_orders", LEGACY_ORDERS)
+    load_legacy("t_jam_orders", LEGACY_ORDERS)
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import configparser
 from random import randint
 from pprint import pprint as pp
@@ -35,13 +36,15 @@ def biz_gen_500():
 
 def insert_table(cursor, table, values):
     for v in values:
-        val_data = ",".join([str(i) if i is int() else "'{}'".format(i) for i in v])
+        val_data = ",".join(
+            [str(i) if i is int() else "'{}'".format(i) for i in v])
         s = "INSERT INTO {t} () VALUES ({d})".format(t=table, d=val_data)
         cursor.execute(s)
 
 
 def load_new(table, values):
-    c = pymysql.connect(database="jam", autocommit=True, read_default_file="~/.my.cnf")
+    c = pymysql.connect(database="jam", autocommit=True,
+                        read_default_file="~/.my.cnf")
     cur = c.cursor()
     cur.execute("DELETE FROM {}".format(table))
     insert_table(cur, table, values)
@@ -53,11 +56,12 @@ def load_new(table, values):
     c.close()
 
 
-def load_legacy(table, values):
+def load_legacy(table, values,
+                cnf_path=os.environ['HOME'] + "/.legacy.cnf",
+                cnf_section="jam"):
     parser = configparser.ConfigParser()
-    parser.read("~/.legacy.cnf")
-    db_opts = {parser[section][i]: i for i in (
-        'host', 'port', 'user', 'password', 'database')}
+    parser.read(cnf_path)
+    db_opts = dict(parser[cnf_section])
     c = pymssql.connect(**db_opts)
     cur = c.cursor()
     cur.execute("DELETE FROM {}".format(table))
@@ -95,4 +99,3 @@ if __name__ == "__main__":
 
     load_new("t_jam_orders", NEW_ORDERS)
     load_legacy("t_jam_orders", LEGACY_ORDERS)
-

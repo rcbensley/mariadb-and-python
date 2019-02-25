@@ -19,8 +19,14 @@ class TableReport:
 
     def get(self):
         sql = ("SELECT "
-               "c.customer_name"
+               "o.order_id"
+               ", c.customer_id"
+               ", c.customer_name"
+               ", p.product_id"
                ", p.product_name"
+               ", p.price"
+               ", o.qty"
+               ", o.order_date"
                ", SUM(p.price * o.qty) as total "
                "FROM t_jam_orders o "
                "JOIN t_jam_customers c ON o.customer_id = c.customer_id "

@@ -1,10 +1,10 @@
 CLS
 
-PRINT "CURRENT HOUR IS?"
-INPUT hour
+PRINT "HOUR?"
+INPUT hour  
 
-FOR 1 TO hour
-  PRINT "BONG"
+FOR i=1 TO hour
+PRINT "BONG"
 NEXT i
-
 END
+

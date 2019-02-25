@@ -3,7 +3,13 @@ CREATE DATABASE jamalytics;
 USE jamalytics;
 
 CREATE TABLE `jam_summary` (
-  `customer_name` varchar(128),
-  `product_name` varchar(128),
-  `total` decimal(42,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+	order_id BIGINT(20) NOT NULL,
+	customer_id BIGINT(20) NOT NULL,
+	customer_name VARCHAR(128) NOT NULL,
+	product_id BIGINT(20) NOT NULL,
+	product_name VARCHAR(128) NOT NULL,
+	price DECIMAL(10,2) NOT NULL,
+	qty INT(11) NOT NULL,
+	order_date DATETIME NOT NULL,
+	price DECIMAL(64,2) NOT NULL
+);

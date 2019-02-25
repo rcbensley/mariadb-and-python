@@ -12,10 +12,7 @@ class TableReport:
         self.opts = self.read_cnf(cnf_path, cnf_section)
         self.uri = uri_str.format(**self.opts)
         self.table_name = table_name
-        if df is not None:
-            self.db = df
-        else:
-            self.df = None
+        self.df = df
 
     def __add__(self, i):
         return self.df + i.df
@@ -37,9 +34,10 @@ class TableReport:
         return db_opts
 
     def write(self):
+        print(self.df)
         self.df.to_sql(self.table_name,
                        self.uri,
-                       schema=self.opts['database'],
+                       #schema=self.opts['database'],
                        if_exists='replace',
                        index=True,
                        index_label=None,
@@ -53,5 +51,5 @@ if __name__ == '__main__':
     db_new = TableReport('~/.my.cnf', 'jam')
     db_new.get()
     report_df = db_archive + db_new
-    db_cs = TableReport('~/.my.cnf', 'jamalytics', df=report_df)
+    db_cs = TableReport('~/.my.cnf', 'jamalytics', table_name='jamalytics', df=report_df)
     db_cs.write()

@@ -1,70 +1,57 @@
-#!/usr/bin/env python3 -W ignore::DeprecationWarning
+#!/usr/bin/env python3
 
 import os
 import configparser
 
 import pandas
-import sqlalchemy
 
 
-class Db:
-    def __init__(self, uri: str):
-        self.uri = uri
-        self.engine = sqlalchemy.create_engine(self.uri)
-        self.df = None
+class TableReport:
+    def __init__(self, cnf_path, cnf_section, table_name=None, df=None):
+        uri_str = 'mysql+pymysql://{user}:{password}@{host}:{port}/{database}'
+        self.opts = self.read_cnf(cnf_path, cnf_section)
+        self.uri = uri_str.format(**self.opts)
+        self.table_name = table_name
+        if df is not None:
+            self.db = df
+        else:
+            self.df = None
 
-    def __add__(self, inbound_df):
-        return self.df + inbound_df
+    def __add__(self, i):
+        return self.df + i.df
 
     def get(self):
-        self.df = pandas.read_sql_query('sql', self.engine)
+        sql = ("SELECT "
+               "c.customer_name"
+               ", p.product_name"
+               ", SUM(p.price * o.qty) as total "
+               "FROM t_jam_orders o "
+               "JOIN t_jam_customers c ON o.customer_id = c.customer_id "
+               "JOIN t_jam_products p ON o.product_id = p.product_id")
+        self.df = pandas.read_sql_query(sql, self.uri)
 
+    def read_cnf(self, cnf_path, cnf_section):
+        parser = configparser.ConfigParser()
+        parser.read(os.path.expanduser(cnf_path))
+        db_opts = dict(parser[cnf_section])
+        return db_opts
 
-def db_factory(rdbms, driver,
-               cnf_path, cnf_section,
-               opts: str = ''):
-    '''Mash together a dict to create a uri string, to create a Db object'''
-    c = read_cnf(cnf_path, cnf_section)
-    c['rdbms'] = rdbms
-    c['driver'] = driver
-    c['opts'] = opts
-    u = '{rdbms}+{driver}://{user}:{password}@{host}:{port}/{opts}'.format(**c)
-    return Db(u)
-
-
-def read_cnf(cnf_path, section):
-    # cat ~/.file.cnf
-    # [section_name]
-    # host = a
-    # port = b
-    # user = c
-    # password = d
-    # database = e
-    parser = configparser.ConfigParser()
-    parser.read(cnf_path)
-    db_opts = {parser[section][i]: i for i in (
-        'host', 'port', 'user', 'password', 'database')}
-    return db_opts
-
-
-def cnf_path_str(cnf_name):
-    return os.environ['HOME'] + f'/.{cnf_name}.cnf'
-
-
-def upload(df, path):
-    pass
+    def write(self):
+        self.df.to_sql(self.table_name,
+                       self.uri,
+                       schema=self.opts['database'],
+                       if_exists='replace',
+                       index=True,
+                       index_label=None,
+                       chunksize=None,
+                       dtype=None)
 
 
 if __name__ == '__main__':
-    db_legacy = db_factory('mssql',
-                           'pymssql',
-                           cnf_path_str('legacy'),
-                           'jam',
-                           '?charset=utf8')
-    db_new = db_factory('mysql',
-                        'pymysql',
-                        cnf_path_str('my'),
-                        'jam')
-
-    report_df = db_legacy + db_new
-    upload(report_df)
+    db_archive = TableReport('~/.my.cnf', 'archive')
+    db_archive.get()
+    db_new = TableReport('~/.my.cnf', 'jam')
+    db_new.get()
+    report_df = db_archive + db_new
+    db_cs = TableReport('~/.my.cnf', 'jamalytics', df=report_df)
+    db_cs.write()

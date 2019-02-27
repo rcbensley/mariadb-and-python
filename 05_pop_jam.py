@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from random import randint
+from random import randint, randrange
 from pprint import pprint as pp
 from datetime import datetime as dt
 from datetime import timedelta as td
@@ -49,42 +49,46 @@ def load(table, values, defaults_group, defaults_file="~/.my.cnf", ):
     cur.execute(TEST_SELECT)
     r = cur.fetchall()
     if r:
-        print("MariaDB")
         pp(r)
     cur.close()
     c.close()
 
 
-def gen_orders(day_offset, denormalize=False):
-    orders = []
-    order_counter = 1
-    while order_counter <= 10000:
-        for c in CUSTOMERS:
-            customer_id = c[0]
-            for p in range(1, 9):
-                product_id = p
-                qty = randint(1, 200)
-                day_offset += randint(1, 13)
-                order_date = dt.today() - td(days=day_offset)
-                order_date_str = order_date.strftime("%Y-%m-%d %H:%M:%S")
-                o = [order_counter, customer_id,
-                     product_id, qty, order_date_str]
-                orders.append(o)
-                order_counter += 1
-    return orders
-
-
 if __name__ == "__main__":
-    CUSTOMERS = ([(randint(1, 1000), biz_gen_500()) for _ in range(1, 31)])
-    NEW_ORDERS = gen_orders(day_offset=7)
+
+    CUSTOMERS = list()
+    for i in range(1, 26):
+        customer_id = i
+        customer_name = biz_gen_500()
+        customer = (customer_id, customer_name)
+        print(customer)
+        CUSTOMERS.append(customer)
+
+    PRODUCTS = list(range(1, 9))
+
+    def gen_orders(day_offset, denormalize=False,
+                   order_count=10000, order_start=1):
+        orders = []
+        for i in range(order_start, order_count + order_start):
+            customer_id = CUSTOMERS[randrange(0, len(CUSTOMERS))][0]
+            product_id = PRODUCTS[randrange(0, len(PRODUCTS))]
+            qty = randint(1, 200)
+            day_offset += randint(1, 13)
+            order_date = dt.today() - td(days=day_offset)
+            order_date_str = order_date.strftime("%Y-%m-%d %H:%M:%S")
+            o = [i, customer_id,
+                 product_id, qty, order_date_str]
+            orders.append(o)
+        return orders
+
+    NEW_ORDERS = gen_orders(day_offset=7, order_start=10001)
     ARCHIVE_ORDERS = gen_orders(day_offset=(3*365))
 
-    print("Loading mariadb customers")
+    print("Loading customers")
     load("t_jam_customers", CUSTOMERS, defaults_group='jam')
-    print("Loading archive customers")
     load("t_jam_customers", CUSTOMERS, defaults_group='archive')
 
-    print("Loading mariadb orders")
+    print("Loading New Orders")
     load("t_jam_orders", NEW_ORDERS, defaults_group='jam')
-    print("Loading archive orders")
+    print("Loading Archive Orders")
     load("t_jam_orders", ARCHIVE_ORDERS, defaults_group='archive')

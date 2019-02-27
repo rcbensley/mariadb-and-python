@@ -74,6 +74,7 @@ if __name__ == '__main__':
     db_new = JamSummaryReport('jam')
     db_new.dump_report(file_path=prod_file)
 
+    # Load Analytics
     db_analytics = JamSummaryReport('jamalytics')
     db_analytics.delete_from_report()
     db_analytics.load_report(file_path=archive_file)

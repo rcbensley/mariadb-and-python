@@ -58,7 +58,7 @@ def load(table, values, defaults_group, defaults_file="~/.my.cnf", ):
 def gen_orders(day_offset, denormalize=False):
     orders = []
     order_counter = 1
-    while order_counter <= 1000:
+    while order_counter <= 10000:
         for c in CUSTOMERS:
             customer_id = c[0]
             for p in range(1, 9):
@@ -75,7 +75,7 @@ def gen_orders(day_offset, denormalize=False):
 
 
 if __name__ == "__main__":
-    CUSTOMERS = ([(randint(1, 1000), biz_gen_500()) for _ in range(1, 11)])
+    CUSTOMERS = ([(randint(1, 1000), biz_gen_500()) for _ in range(1, 31)])
     NEW_ORDERS = gen_orders(day_offset=7)
     ARCHIVE_ORDERS = gen_orders(day_offset=(3*365))
 

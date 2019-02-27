@@ -14,9 +14,10 @@ db_opts_sqlite = {'database': '/tmp/test.sqlite'}
 
 sql_values = ",".join(list([f"({i})" for i in range(1, 11)]))
 #  '(1),(2),(3),(4),(5),(6),(7),(8),(9),(10)'
+
 sql = ("DROP TABLE IF EXISTS test_table;",
        "CREATE TABLE IF NOT EXISTS test_table(a int);",
-       f"INSERT INTO test_table (a) VALUES {sql_values}",
+       "INSERT INTO test_table (a) VALUES {sql_values}".format(sql_values=sql_values),
        "SELECT * FROM test_table;")
 
 

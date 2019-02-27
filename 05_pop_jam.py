@@ -39,17 +39,19 @@ def insert_table(cursor, table, values):
         cursor.execute(s)
 
 
-def load(table, values, defaults_group, defaults_file="~/.my.cnf", ):
+def load(table, values, defaults_group, defaults_file="~/.my.cnf",
+         test_sql=False):
     c = pymysql.connect(autocommit=True,
                         read_default_file=defaults_file,
                         read_default_group=defaults_group)
     cur = c.cursor()
     cur.execute("DELETE FROM {}".format(table))
     insert_table(cur, table, values)
-    cur.execute(TEST_SELECT)
-    r = cur.fetchall()
-    if r:
-        pp(r)
+    if test_sql is True:
+        cur.execute(TEST_SELECT)
+        r = cur.fetchall()
+        if r:
+            pp(r)
     cur.close()
     c.close()
 
@@ -61,20 +63,20 @@ if __name__ == "__main__":
         customer_id = i
         customer_name = biz_gen_500()
         customer = (customer_id, customer_name)
-        print(customer)
         CUSTOMERS.append(customer)
 
     PRODUCTS = list(range(1, 9))
 
     def gen_orders(day_offset, denormalize=False,
                    order_count=10000, order_start=1):
-        orders = []
+        orders = list()
+
         for i in range(order_start, order_count + order_start):
             customer_id = CUSTOMERS[randrange(0, len(CUSTOMERS))][0]
             product_id = PRODUCTS[randrange(0, len(PRODUCTS))]
             qty = randint(1, 200)
-            day_offset += randint(1, 13)
-            order_date = dt.today() - td(days=day_offset)
+            order_date_offset = day_offset + randrange(1, 31)
+            order_date = dt.today() - td(days=order_date_offset)
             order_date_str = order_date.strftime("%Y-%m-%d %H:%M:%S")
             o = [i, customer_id,
                  product_id, qty, order_date_str]
@@ -82,13 +84,15 @@ if __name__ == "__main__":
         return orders
 
     NEW_ORDERS = gen_orders(day_offset=7, order_start=10001)
-    ARCHIVE_ORDERS = gen_orders(day_offset=(3*365))
+    ARCHIVE_ORDERS = gen_orders(day_offset=365)
 
     print("Loading customers")
     load("t_jam_customers", CUSTOMERS, defaults_group='jam')
     load("t_jam_customers", CUSTOMERS, defaults_group='archive')
 
     print("Loading New Orders")
-    load("t_jam_orders", NEW_ORDERS, defaults_group='jam')
+    load("t_jam_orders", NEW_ORDERS, defaults_group='jam',
+         test_sql=True)
     print("Loading Archive Orders")
-    load("t_jam_orders", ARCHIVE_ORDERS, defaults_group='archive')
+    load("t_jam_orders", ARCHIVE_ORDERS, defaults_group='archive',
+         test_sql=True)

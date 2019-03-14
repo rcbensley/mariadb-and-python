@@ -1,3 +1,8 @@
+Watch this talk and many other cool talks:
+
+* https://mariadb.com/openworks/sessions-on-demand/2019-getting-started-with-mariadb-and-python/
+* https://mariadb.com/openworks/2019-sessions-on-demand/
+
 # Getting Started with MariaDB and Python
 
 * 01, Python and Amiga BASIC.

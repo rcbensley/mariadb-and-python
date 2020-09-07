@@ -4,7 +4,7 @@ from random import randint, randrange
 from pprint import pprint as pp
 from datetime import datetime as dt
 from datetime import timedelta as td
-import pymysql
+import mariadb
 
 TEST_SELECT = """
 SELECT
@@ -41,7 +41,7 @@ def insert_table(cursor, table, values):
 
 def load(table, values, defaults_group, defaults_file="~/.my.cnf",
          test_sql=False):
-    c = pymysql.connect(autocommit=True,
+    c = mariadb.connect(autocommit=True,
                         read_default_file=defaults_file,
                         read_default_group=defaults_group)
     cur = c.cursor()

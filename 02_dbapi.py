@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import pymysql
+import mariadb
 import sqlite3
 
 
@@ -34,7 +34,7 @@ def query_db(driver, db_opts, sql):
 
 
 print("Query MariaDB:")
-query_db(pymysql, db_opts_mariadb, sql)
+query_db(mariadb, db_opts_mariadb, sql)
 
 print("Query SQLite:")
 query_db(sqlite3, db_opts_sqlite, sql)

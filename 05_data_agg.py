@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-import pymysql
+import mariadb
 
 
 class JamSummaryReport:
@@ -11,7 +11,7 @@ class JamSummaryReport:
         self.defaults_group = defaults_group
 
     def query(self, sql):
-        db = pymysql.connect(autocommit=True,
+        db = mariadb.connect(autocommit=True,
                              local_infile=True,
                              read_default_file=self.defaults_file,
                              read_default_group=self.defaults_group)

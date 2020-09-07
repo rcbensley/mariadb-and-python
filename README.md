@@ -45,7 +45,7 @@ five does not appear to be a number between 1 and 12
 ```
 
 ## 02 DBAPI example
-Query both MariaDB using PyMySQL and SQLite3 (part of python standard library).
+Query both MariaDB using mariadb and SQLite3 (part of python standard library).
 This script creates a table on both databases, for MariaDB the schema 'test' must be available and writable by the user in your config file.
 Just run the script with no options, you should see this:
 ```
@@ -78,7 +78,7 @@ Query SQLite:
 Just a very basic exmaple, or selecting and reading data from my local MariaDB instance, and using the home config file to parse information to the driver to connect and query MariaDB.
 
 ## 04 Multi-Query-MariaDB
-A working example based on another script I maintain to query multiple MariaDB servers at once using PyMySQL and Multiprocessing.
+A working example based on another script I maintain to query multiple MariaDB servers at once using mariadb and Multiprocessing.
 Here is a quick example, of querying both my local MariaDB and the ColumnStore in Docker:
 ```
 ./04_mqm.py --hosts=127.0.0.1:3306,127.0.0.1:3307 "select @@version,@@version_comment,now()"

@@ -4,7 +4,7 @@
 
 import argparse
 import multiprocessing as mp
-import pymysql
+import mariadb
 
 DEFAULT_MARIADB_PORT = 3306
 DEFAULTS_FILE = "~/.my.cnf"
@@ -37,7 +37,7 @@ def queries(args: list = args()):
 def query(hostname: str, port: int, sql: str):
     title = "{hostname}:{port}".format(hostname=hostname, port=port)
     local_results = []
-    db = pymysql.connect(host=hostname,
+    db = mariadb.connect(host=hostname,
                          port=port,
                          read_default_file=DEFAULTS_FILE,
                          read_default_group=DEFAULTS_GROUP)

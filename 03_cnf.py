@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import pymysql
+import mariadb
 
 CONNECTION_ARGS = {"host": "127.0.0.1",
                    "port": 3306,
@@ -9,7 +9,7 @@ CONNECTION_ARGS = {"host": "127.0.0.1",
 
 
 def query(sql, connection_args: dict = CONNECTION_ARGS):
-    db = pymysql.connect(**connection_args)
+    db = mariadb.connect(**connection_args)
     cur = db.cursor()
     try:
         cur.execute(sql)
